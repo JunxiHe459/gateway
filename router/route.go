@@ -1,11 +1,8 @@
 package router
 
 import (
-	"github.com/e421083458/gin_scaffold/controller"
-	"github.com/e421083458/gin_scaffold/docs"
-	"github.com/e421083458/gin_scaffold/middleware"
+	"github.com/JunxiHe459/gateway/docs"
 	"github.com/e421083458/golang_common/lib"
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
@@ -67,41 +64,17 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	router := gin.Default()
 	router.Use(middlewares...)
+
+	// ping
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
+
+	// Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	ginSwagger.WrapHandler(swaggerFiles.Handler)
 
-	//demo
-	v1 := router.Group("/demo")
-	v1.Use(middleware.RecoveryMiddleware(), middleware.RequestLog(), middleware.IPAuthMiddleware(), middleware.TranslationMiddleware())
-	{
-		controller.DemoRegister(v1)
-	}
-
-	//非登陆接口
-	store := sessions.NewCookieStore([]byte("secret"))
-	apiNormalGroup := router.Group("/api")
-	apiNormalGroup.Use(sessions.Sessions("mysession", store),
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.TranslationMiddleware())
-	{
-		controller.ApiRegister(apiNormalGroup)
-	}
-
-	//登陆接口
-	apiAuthGroup := router.Group("/api")
-	apiAuthGroup.Use(
-		sessions.Sessions("mysession", store),
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
-		middleware.TranslationMiddleware())
-	{
-		controller.ApiLoginRegister(apiAuthGroup)
-	}
 	return router
 }
