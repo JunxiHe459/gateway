@@ -3,6 +3,7 @@ package dto
 import (
 	"github.com/JunxiHe459/gateway/public"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 type AdminLoginInput struct {
@@ -14,6 +15,12 @@ type AdminLoginInput struct {
 
 type AdminLoginOutput struct {
 	Token string `json:"token" form:"token"`
+}
+
+type AdminSessionInfo struct {
+	ID        int       `json:"id"`
+	UsernName string    `json:"username"`
+	LoginTime time.Time `json:"login_time"`
 }
 
 //

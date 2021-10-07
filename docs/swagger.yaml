@@ -17,6 +17,17 @@ definitions:
 info:
   contact: {}
 paths:
+  /admin/info:
+    get:
+      consumes:
+      - application/json
+      description: Admin Login 接口
+      operationId: /admin/info
+      produces:
+      - application/json
+      summary: Admin Login
+      tags:
+      - 管理员登陆接口
   /admin/login:
     post:
       consumes:
@@ -35,4 +46,15 @@ paths:
       summary: Admin Login
       tags:
       - 管理员登陆接口
+  /admin/logout:
+    get:
+      consumes:
+      - application/json
+      description: Admin Log out 接口
+      operationId: /admin/logout
+      produces:
+      - application/json
+      summary: Admin Log out
+      tags:
+      - 管理员退出接口
 swagger: "2.0"

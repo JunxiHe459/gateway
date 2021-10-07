@@ -23,6 +23,22 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/info": {
+            "get": {
+                "description": "Admin Login 接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员登陆接口"
+                ],
+                "summary": "Admin Login",
+                "operationId": "/admin/info"
+            }
+        },
         "/admin/login": {
             "post": {
                 "description": "Admin Login 接口",
@@ -48,6 +64,22 @@ var doc = `{
                         }
                     }
                 ]
+            }
+        },
+        "/admin/logout": {
+            "get": {
+                "description": "Admin Log out 接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员退出接口"
+                ],
+                "summary": "Admin Log out",
+                "operationId": "/admin/logout"
             }
         }
     },

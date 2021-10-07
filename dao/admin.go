@@ -44,6 +44,7 @@ func (admin *Admin) LoginAndCheck(c *gin.Context, db *gorm.DB,
 		return nil, errors.New("Unable to find user")
 	}
 
+	// 校验 password
 	salted_password := public.SaltPassword(adminInfo.Salt, param.Password)
 	if salted_password != adminInfo.Password {
 		//println("Admin Password:", adminInfo.Password)

@@ -91,11 +91,28 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware(),
 	)
-	// 为 adminGroup 注册 Admin Log in 到 /admin/login 这个路径
-	//controller.RegiterAdminLogin(adminGroup)
-	// 效果等同于
-	adminLogin := controller.AdminLoginController{}
-	adminGroup.POST("/login", adminLogin.AdminLogin)
 
+	// 为 adminGroup 注册 Admin Log in 到 /admin/login 这个路径
+	controller.RegiterAdminLogin(adminGroup)
+	// 效果等同于
+	//adminLogin := controller.AdminLoginController{}
+	//adminGroup.POST("/login", adminLogin.AdminLogin)
+
+	// 为 adminInfoGroup 注册 Admin Info	 到 /admin/info 这个路径
+	adminInfoGroup := router.Group("/admin/info")
+	if err != nil {
+		print("NewRedisStore Error: ", err.Error())
+		log.Fatalf("NewRedisStore Error: %v", err.Error())
+	}
+	// 为 adminGroup 启用中间件
+	adminInfoGroup.Use(
+		sessions.Sessions("AdminSession", redis),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		// 用来校验 session 的一个中间件
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware(),
+	)
+	controller.RegiterAdminInfo(adminInfoGroup)
 	return router
 }
