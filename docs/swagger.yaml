@@ -1,62 +1,38 @@
 definitions:
-  dto.DemoInput:
+  dto.AdminLoginInput:
     properties:
-      age:
-        example: 20
-        type: integer
-      name:
-        example: 姓名
+      password:
+        example: password
         type: string
-      passwd:
-        example: "123456"
+      username:
+        description: |-
+          如果 validate 设置为 required，则会用 gin 提供的 validator 去进行校验
+          可以在 validate 后面添加自定义验证器, 参见 middleware.validator.go
+        example: admin
         type: string
     required:
-    - age
-    - name
-    - passwd
-    type: object
-  middleware.Response:
-    properties:
-      data:
-        type: object
-      errmsg:
-        type: string
-      errno:
-        type: integer
-      stack:
-        type: object
-      trace_id:
-        type: object
+    - password
+    - username
     type: object
 info:
   contact: {}
 paths:
-  /demo/bind:
+  /admin/login:
     post:
       consumes:
       - application/json
-      description: 测试数据绑定
-      operationId: /demo/bind
+      description: Admin Login 接口
+      operationId: /admin/login
       parameters:
       - description: body
         in: body
-        name: polygon
+        name: body
         required: true
         schema:
-          $ref: '#/definitions/dto.DemoInput'
+          $ref: '#/definitions/dto.AdminLoginInput'
       produces:
       - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            allOf:
-            - $ref: '#/definitions/middleware.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.DemoInput'
-              type: object
-      summary: 测试数据绑定
+      summary: Admin Login
       tags:
-      - 用户
+      - 管理员登陆接口
 swagger: "2.0"

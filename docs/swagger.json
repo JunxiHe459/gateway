@@ -4,9 +4,9 @@
         "contact": {}
     },
     "paths": {
-        "/demo/bind": {
+        "/admin/login": {
             "post": {
-                "description": "测试数据绑定",
+                "description": "Admin Login 接口",
                 "consumes": [
                     "application/json"
                 ],
@@ -14,84 +14,40 @@
                     "application/json"
                 ],
                 "tags": [
-                    "用户"
+                    "管理员登陆接口"
                 ],
-                "summary": "测试数据绑定",
-                "operationId": "/demo/bind",
+                "summary": "Admin Login",
+                "operationId": "/admin/login",
                 "parameters": [
                     {
                         "description": "body",
-                        "name": "polygon",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.DemoInput"
+                            "$ref": "#/definitions/dto.AdminLoginInput"
                         }
                     }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/middleware.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.DemoInput"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
+                ]
             }
         }
     },
     "definitions": {
-        "dto.DemoInput": {
+        "dto.AdminLoginInput": {
             "type": "object",
             "required": [
-                "age",
-                "name",
-                "passwd"
+                "password",
+                "username"
             ],
             "properties": {
-                "age": {
-                    "type": "integer",
-                    "example": 20
-                },
-                "name": {
+                "password": {
                     "type": "string",
-                    "example": "姓名"
+                    "example": "password"
                 },
-                "passwd": {
+                "username": {
+                    "description": "如果 validate 设置为 required，则会用 gin 提供的 validator 去进行校验\n可以在 validate 后面添加自定义验证器, 参见 middleware.validator.go",
                     "type": "string",
-                    "example": "123456"
-                }
-            }
-        },
-        "middleware.Response": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "object"
-                },
-                "errmsg": {
-                    "type": "string"
-                },
-                "errno": {
-                    "type": "integer"
-                },
-                "stack": {
-                    "type": "object"
-                },
-                "trace_id": {
-                    "type": "object"
+                    "example": "admin"
                 }
             }
         }

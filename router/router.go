@@ -1,11 +1,15 @@
 package router
 
 import (
+	"github.com/JunxiHe459/gateway/controller"
 	"github.com/JunxiHe459/gateway/docs"
+	"github.com/JunxiHe459/gateway/middleware"
 	"github.com/e421083458/golang_common/lib"
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"log"
 )
 
 // @title Swagger Example API
@@ -54,16 +58,18 @@ import (
 // @x-extension-openapi {"example": "value on a json format"}
 
 func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
-	// programatically set swagger info
+	router := gin.Default()
+	router.Use(middlewares...)
+
+	// Set up swagger
 	docs.SwaggerInfo.Title = lib.GetStringConf("base.swagger.title")
 	docs.SwaggerInfo.Description = lib.GetStringConf("base.swagger.desc")
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = lib.GetStringConf("base.swagger.host")
 	docs.SwaggerInfo.BasePath = lib.GetStringConf("base.swagger.base_path")
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
-
-	router := gin.Default()
-	router.Use(middlewares...)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	ginSwagger.WrapHandler(swaggerFiles.Handler)
 
 	// ping
 	router.GET("/ping", func(c *gin.Context) {
@@ -72,9 +78,24 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		})
 	})
 
-	// Swagger
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	ginSwagger.WrapHandler(swaggerFiles.Handler)
+	adminGroup := router.Group("/admin")
+	redis, err := sessions.NewRedisStore(10, "tcp", "localhost:6379", "Karlhe459!", []byte("secret"))
+	if err != nil {
+		print("NewRedisStore Error: ", err.Error())
+		log.Fatalf("NewRedisStore Error: %v", err.Error())
+	}
+	// 为 adminGroup 启用中间件
+	adminGroup.Use(
+		sessions.Sessions("AdminSession", redis),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.TranslationMiddleware(),
+	)
+	// 为 adminGroup 注册 Admin Log in 到 /admin/login 这个路径
+	//controller.RegiterAdminLogin(adminGroup)
+	// 效果等同于
+	adminLogin := controller.AdminLoginController{}
+	adminGroup.POST("/login", adminLogin.AdminLogin)
 
 	return router
 }

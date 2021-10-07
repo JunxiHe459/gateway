@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/JunxiHe459/gateway/global"
 	"github.com/JunxiHe459/gateway/router"
 	"github.com/e421083458/golang_common/lib"
 	"os"
@@ -8,8 +9,12 @@ import (
 	"syscall"
 )
 
+func init() {
+	initConf()
+	initDB()
+}
+
 func main() {
-	lib.InitModule("./conf/dev/", []string{"base", "mysql", "redis"})
 	defer lib.Destroy()
 	router.HttpServerRun()
 
@@ -18,4 +23,16 @@ func main() {
 	<-quit
 
 	router.HttpServerStop()
+}
+
+func initConf() {
+	_ = lib.InitModule("./conf/dev/", []string{"base", "mysql", "redis"})
+}
+
+func initDB() {
+	var err error
+	global.DB, err = lib.GetGormPool("default")
+	if err != nil {
+		print("Get Global Variable DB failed")
+	}
 }

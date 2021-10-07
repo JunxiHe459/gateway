@@ -45,10 +45,10 @@ func ResponseError(c *gin.Context, code ResponseCode, err error) {
 	}
 
 	resp := &Response{ErrorCode: code, ErrorMsg: err.Error(), Data: "", TraceId: traceId, Stack: stack}
-	c.JSON(200, resp)
+	c.JSON(400, resp)
 	response, _ := json.Marshal(resp)
 	c.Set("response", string(response))
-	c.AbortWithError(200, err)
+	c.AbortWithError(400, err)
 }
 
 func ResponseSuccess(c *gin.Context, data interface{}) {
