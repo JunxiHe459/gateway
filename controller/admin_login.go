@@ -16,7 +16,7 @@ import (
 type AdminLoginController struct {
 }
 
-func RegiterAdminLogin(group *gin.RouterGroup) {
+func RegiterAdmin(group *gin.RouterGroup) {
 	admin := &AdminLoginController{}
 	group.POST("/login", admin.AdminLogin)
 	group.GET("/logout", admin.AdminLogout)
@@ -30,7 +30,7 @@ func RegiterAdminLogin(group *gin.RouterGroup) {
 // @Accept json
 // @Produce json
 // @Param body body dto.AdminLoginInput true "body"
-// @Sucess 200 {object} middleware.Response{data=dto.AdminLoginOutput} "success"
+// @Success 200 {object} middleware.Response{data=dto.AdminLoginOutput} "success"
 // @Router /admin/login [POST]
 func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 	params := &dto.AdminLoginInput{}
@@ -74,14 +74,14 @@ func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 	return
 }
 
-// AdminLogout godoc
+// AdminLogin godoc
 // @Summary Admin Log out
 // @Description Admin Log out 接口
 // @Tags 管理员接口
 // @ID /admin/logout
 // @Accept json
 // @Produce json
-// @Sucess 200 {object} middleware.Response{data=string} "success"
+// @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /admin/logout [GET]
 func (admin *AdminLoginController) AdminLogout(c *gin.Context) {
 	s := sessions.Default(c)

@@ -25,7 +25,7 @@ var doc = `{
     "paths": {
         "/admin/info": {
             "get": {
-                "description": "Admin Login 接口",
+                "description": "Admin 修改密码接口",
                 "consumes": [
                     "application/json"
                 ],
@@ -33,10 +33,30 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "管理员登陆接口"
+                    "管理员接口"
                 ],
-                "summary": "Admin Login",
-                "operationId": "/admin/info"
+                "summary": "Admin Change Password",
+                "operationId": "/admin/info/change_password",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AdminLoginOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         },
         "/admin/login": {
@@ -49,7 +69,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "管理员登陆接口"
+                    "管理员接口"
                 ],
                 "summary": "Admin Login",
                 "operationId": "/admin/login",
@@ -63,7 +83,27 @@ var doc = `{
                             "$ref": "#/definitions/dto.AdminLoginInput"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AdminLoginOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         },
         "/admin/logout": {
@@ -76,10 +116,30 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "管理员退出接口"
+                    "管理员接口"
                 ],
                 "summary": "Admin Log out",
-                "operationId": "/admin/logout"
+                "operationId": "/admin/logout",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         }
     },
@@ -99,6 +159,34 @@ var doc = `{
                     "description": "如果 validate 设置为 required，则会用 gin 提供的 validator 去进行校验\n可以在 validate 后面添加自定义验证器, 参见 middleware.validator.go",
                     "type": "string",
                     "example": "admin"
+                }
+            }
+        },
+        "dto.AdminLoginOutput": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "middleware.Response": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "errmsg": {
+                    "type": "string"
+                },
+                "errno": {
+                    "type": "integer"
+                },
+                "stack": {
+                    "type": "object"
+                },
+                "trace_id": {
+                    "type": "object"
                 }
             }
         }

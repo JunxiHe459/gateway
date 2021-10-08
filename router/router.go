@@ -78,6 +78,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		})
 	})
 
+	// AdminGroup 路由分组
 	adminGroup := router.Group("/admin")
 	redis, err := sessions.NewRedisStore(10, "tcp", "localhost:6379", "Karlhe459!", []byte("secret"))
 	if err != nil {
@@ -91,9 +92,8 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware(),
 	)
-
 	// 为 adminGroup 注册 Admin Log in 到 /admin/login 这个路径
-	controller.RegiterAdminLogin(adminGroup)
+	controller.RegiterAdmin(adminGroup)
 	// 效果等同于
 	//adminLogin := controller.AdminLoginController{}
 	//adminGroup.POST("/login", adminLogin.AdminLogin)
@@ -114,5 +114,22 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.TranslationMiddleware(),
 	)
 	controller.RegiterAdminInfo(adminInfoGroup)
+
+	// Service
+	serviceGroup := router.Group("/service")
+	if err != nil {
+		print("NewRedisStore Error: ", err.Error())
+		log.Fatalf("NewRedisStore Error: %v", err.Error())
+	}
+	serviceGroup.Use(
+		sessions.Sessions("AdminSession", redis),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware(),
+	)
+	controller.RegiterService(serviceGroup)
+
 	return router
+
 }
