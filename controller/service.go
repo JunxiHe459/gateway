@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"github.com/JunxiHe459/gateway/dao"
 	"github.com/JunxiHe459/gateway/dto"
+	"github.com/JunxiHe459/gateway/global"
 	"github.com/JunxiHe459/gateway/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +29,7 @@ func RegiterService(group *gin.RouterGroup) {
 // @Success 200 {object} middleware.Response{data=dto.ServiceListOutput} "success"
 // @Router /service/service_list [GET]
 func (s *ServiceController) ServiceList(c *gin.Context) {
+	// 绑定参数
 	params := &dto.ServiceListInput{}
 	err := params.BindParam(c)
 	if err != nil {
@@ -34,6 +37,29 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 		middleware.ResponseError(c, 400, err)
 	}
 
-	out := &dto.ServiceListOutput{}
+	// 从数据库拿到 []serviceInfo
+	serviceInfo := &dao.ServiceInfo{}
+	list, total, err := serviceInfo.GetPageList(c, global.DB, params)
+	if err != nil {
+		println("Get serviceList error: ", err.Error())
+		middleware.ResponseError(c, 2001, err)
+	}
+
+	// 将 []serviceInf 转换成 []singleService
+	var serviceList []dto.SingleService
+	for _, item := range list {
+		singleService := dto.SingleService{
+			ID:          item.ID,
+			ServiceName: item.ServiceName,
+			ServiceDesc: item.ServiceDesc,
+		}
+		serviceList = append(serviceList, singleService)
+	}
+
+	// 绑定响应
+	out := &dto.ServiceListOutput{
+		total,
+		serviceList,
+	}
 	middleware.ResponseSuccess(c, out)
 }

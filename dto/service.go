@@ -23,8 +23,8 @@ type SingleService struct {
 }
 
 type ServiceListOutput struct {
-	TotalPage   int             `json:"total_page" form:"total_page" validate:"required"`
-	ServiceList []SingleService `json:"single_service" form:"single_service" validate:"required"`
+	TotalServices int64           `json:"total_services" form:"total_services" validate:"required"`
+	ServiceList   []SingleService `json:"service_list" form:"service_list" validate:"required"`
 }
 
 func (param *ServiceListInput) BindParam(c *gin.Context) error {

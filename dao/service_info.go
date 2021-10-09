@@ -1,0 +1,66 @@
+package dao
+
+import (
+	"github.com/JunxiHe459/gateway/dto"
+	"github.com/JunxiHe459/gateway/public"
+	"github.com/e421083458/gorm"
+	"github.com/gin-gonic/gin"
+	"time"
+)
+
+type ServiceInfo struct {
+	ID          int64 `json:"id" gorm:"primary_key"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	LoadType    int    `json:"load_type" gorm:"column:load_type" description:"负载类型 0=http 1=tcp 2=grpc"`
+	ServiceName string `json:"service_name" gorm:"column:service_name" description:"服务名称"`
+	ServiceDesc string `json:"service_desc" gorm:"column:service_desc" description:"服务描述"`
+	IsDelete    int8   `json:"is_delete" gorm:"column:is_delete" description:"是否已删除；0：否；1：是"`
+}
+
+func (service *ServiceInfo) TableName() string {
+	return "gateway_service_info"
+}
+
+func (service *ServiceInfo) Find(c *gin.Context, db *gorm.DB, search *ServiceInfo) (*ServiceInfo, error) {
+	out := &ServiceInfo{}
+	err := db.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(out).Error
+	if err != nil {
+		print(err.Error())
+		return nil, err
+	}
+	return out, nil
+}
+
+func (service *ServiceInfo) Save(c *gin.Context, db *gorm.DB) error {
+	err := db.SetCtx(public.GetGinTraceContext(c)).Save(service).Error
+	if err != nil {
+		print(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (service *ServiceInfo) GetPageList(c *gin.Context, db *gorm.DB, param *dto.ServiceListInput) (list []ServiceInfo, total int64, err error) {
+	offset := (param.PageNumber - 1) * param.PageNumber
+	query := db.SetCtx(public.GetGinTraceContext(c)).Table(service.TableName()).Where("is_delete=0")
+
+	if param.Keyword != "" {
+		query = query.Where("service_name like ? or service_desc like ?", "%"+param.Keyword+"%", "%"+param.Keyword+"%")
+	}
+
+	// 如果数据库为空，则 err 会是 ErrRecordNotFound，这是没问题的
+	// 如果 err 不是 ErrRecordNotFound 才证明是真的有问题，所以下面进行一个判断
+	err = query.Offset(offset).Limit(param.PageSize).Find(&list).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, 0, err
+	}
+	print("Length of list", len(list))
+	query.Offset(offset).Limit(param.PageSize).Count(&total)
+
+	return
+}
+
+func (service *ServiceInfo) GetServiceDetail(c *gin.Context, db *gorm.DB, info ServiceInfo) {
+
+}
