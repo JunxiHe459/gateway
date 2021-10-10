@@ -90,7 +90,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		sessions.Sessions("AdminSession", redis),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.TranslationMiddleware(),
+		middleware.ParamValidationMiddleware(),
 	)
 	// 为 adminGroup 注册 Admin Log in 到 /admin/login 这个路径
 	controller.RegiterAdmin(adminGroup)
@@ -111,7 +111,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RequestLog(),
 		// 用来校验 session 的一个中间件
 		middleware.SessionAuthMiddleware(),
-		middleware.TranslationMiddleware(),
+		middleware.ParamValidationMiddleware(),
 	)
 	controller.RegiterAdminInfo(adminInfoGroup)
 
@@ -126,7 +126,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.SessionAuthMiddleware(),
-		middleware.TranslationMiddleware(),
+		middleware.ParamValidationMiddleware(),
 	)
 	controller.RegiterService(serviceGroup)
 

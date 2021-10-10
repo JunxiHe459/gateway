@@ -18,6 +18,7 @@ func RegiterService(group *gin.RouterGroup) {
 	service := &ServiceController{}
 	group.GET("/service_list", service.ServiceList)
 	group.GET("delete", service.DeleteService)
+	group.POST("add_http", service.AddHTTPService)
 }
 
 // Service godoc
@@ -40,6 +41,7 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 	if err != nil {
 		println("ServiceList bind params error: ", err.Error())
 		middleware.ResponseError(c, 400, err)
+		return
 	}
 
 	// 从数据库拿到 []serviceInfo
@@ -48,6 +50,7 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 	if err != nil {
 		println("Get serviceList error: ", err.Error())
 		middleware.ResponseError(c, 2001, err)
+		return
 	}
 
 	// 将 []serviceInfo 转换成 []singleService
@@ -135,6 +138,7 @@ func (s *ServiceController) DeleteService(c *gin.Context) {
 	if err != nil {
 		println("Bind Params Error: ", err.Error())
 		middleware.ResponseError(c, 400, err)
+		return
 	}
 
 	service := &dao.ServiceInfo{
@@ -145,6 +149,7 @@ func (s *ServiceController) DeleteService(c *gin.Context) {
 	if err != nil {
 		println("Find Service Error: ", err.Error())
 		middleware.ResponseError(c, 2000, err)
+		return
 	}
 
 	// 硬删除
@@ -160,7 +165,31 @@ func (s *ServiceController) DeleteService(c *gin.Context) {
 	if err != nil {
 		println("Save Service Error: ", err.Error())
 		middleware.ResponseError(c, 2001, err)
+		return
 	}
 
 	middleware.ResponseSuccess(c, "Deleted")
+}
+
+// Service godoc
+// @Summary Add a new HTTP Service
+// @Description 添加一个新的 HTTP 服务
+// @Tags 服务管理
+// @ID /service/add_http
+// @Accept json
+// @Produce json
+// @Param body body dto.ServiceAddHTTPInput true "body"
+// @Success 200 {object} middleware.Response{data=dto.ServiceListOutput} "success"
+// @Router /service/add_http [POST]
+func (s *ServiceController) AddHTTPService(c *gin.Context) {
+	params := &dto.ServiceAddHTTPInput{}
+	err := params.BindParam(c)
+	if err != nil {
+		if err != nil {
+			println("ServiceList bind params error: ", err.Error())
+			middleware.ResponseError(c, 400, err)
+			return
+		}
+	}
+
 }

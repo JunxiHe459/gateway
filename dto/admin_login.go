@@ -9,7 +9,7 @@ import (
 type AdminLoginInput struct {
 	// 如果 validate 设置为 required，则会用 gin 提供的 validator 去进行校验
 	// 可以在 validate 后面添加自定义验证器, 参见 middleware.validator.go
-	Username string `json:"username" form:"username" validate:"required,is_valid_username" example:"admin"`
+	Username string `json:"username" form:"username" validate:"required,valid_username" example:"admin"`
 	Password string `json:"password" form:"password" validate:"required" example:"password"`
 }
 

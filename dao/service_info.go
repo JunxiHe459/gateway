@@ -61,7 +61,7 @@ func (service *ServiceInfo) GetPageList(c *gin.Context, db *gorm.DB, param *dto.
 
 	// 如果数据库为空，则 err 会是 ErrRecordNotFound，这是没问题的
 	// 如果 err 不是 ErrRecordNotFound 才证明是真的有问题，所以下面进行一个判断
-	err = query.Offset(offset).Limit(param.PageSize).Find(&list).Error
+	err = query.Offset(offset).Limit(param.PageSize).Order("id desc").Find(&list).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
 	}
