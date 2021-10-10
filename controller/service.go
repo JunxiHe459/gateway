@@ -64,21 +64,21 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 		// 2. Http 域名接入 	 domain
 		// 3. Tcp / Grpc 接入 clusterIP + servicePort
 		serviceAddress := "unknown"
-		cluster_ip := lib.GetStringConf("base.cluster.cluster_ip")
-		cluster_port := lib.GetStringConf("base.cluster.cluster_port")
-		cluster_SSL_port := lib.GetStringConf("base.cluster.cluster_ssl_port")
+		clusterIp := lib.GetStringConf("base.cluster.cluster_ip")
+		clusterPort := lib.GetStringConf("base.cluster.cluster_port")
+		SSLPort := lib.GetStringConf("base.cluster.cluster_ssl_port")
 
 		if serviceDetail.Info.LoadType == public.LoadTypeHTTP {
 			// HTTP 后缀接入 需要 Prefix URL 和 HTTPS
 			if serviceDetail.HTTPRule.RuleType == public.HTTPPrefixURL &&
 				serviceDetail.HTTPRule.NeedHttps == 1 {
-				serviceAddress = cluster_ip + cluster_SSL_port + serviceDetail.HTTPRule.Rule
+				serviceAddress = fmt.Sprintf("%s:%s%s", clusterIp, SSLPort, serviceDetail.HTTPRule.Rule)
 			}
 
 			// HTTP 后缀接入  需要 Prefix URL 不需要 HTTPS
 			if serviceDetail.HTTPRule.RuleType == public.HTTPPrefixURL &&
 				serviceDetail.HTTPRule.NeedHttps == 0 {
-				serviceAddress = cluster_ip + cluster_port + serviceDetail.HTTPRule.Rule
+				serviceAddress = fmt.Sprintf("%s:%s%s", clusterIp, clusterPort, serviceDetail.HTTPRule.Rule)
 			}
 
 			// HTTP 域名接入
@@ -89,12 +89,12 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 
 		// TCP
 		if serviceDetail.Info.LoadType == public.LoadTypeTCP {
-			serviceAddress = fmt.Sprintf("%s:%d", cluster_ip, serviceDetail.TCPRule.Port)
+			serviceAddress = fmt.Sprintf("%s:%d", clusterIp, serviceDetail.TCPRule.Port)
 		}
 
 		// gRPC
 		if serviceDetail.Info.LoadType == public.LoadTypeGRPC {
-			serviceAddress = fmt.Sprintf("%s:%d", cluster_ip, serviceDetail.GRPCRule.Port)
+			serviceAddress = fmt.Sprintf("%s:%d", clusterIp, serviceDetail.GRPCRule.Port)
 		}
 
 		ipList := serviceDetail.LoadBalance.GetIPListByModel()
