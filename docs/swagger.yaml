@@ -19,6 +19,45 @@ definitions:
       token:
         type: string
     type: object
+  dto.ServiceListOutput:
+    properties:
+      service_list:
+        items:
+          $ref: '#/definitions/dto.SingleService'
+        type: array
+      total_services:
+        type: integer
+    required:
+    - service_list
+    - total_services
+    type: object
+  dto.SingleService:
+    properties:
+      id:
+        description: id
+        type: integer
+      load_type:
+        description: 类型
+        type: integer
+      qpd:
+        description: qpd
+        type: integer
+      qps:
+        description: qps
+        type: integer
+      service_address:
+        description: 服务地址
+        type: string
+      service_desc:
+        description: 服务描述
+        type: string
+      service_name:
+        description: 服务名称
+        type: string
+      total_node:
+        description: 节点数
+        type: integer
+    type: object
   middleware.Response:
     properties:
       data:
@@ -37,6 +76,26 @@ info:
 paths:
   /admin/info:
     get:
+      consumes:
+      - application/json
+      description: Admin Info 接口
+      operationId: /admin/info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AdminLoginOutput'
+              type: object
+      summary: Admin Info
+      tags:
+      - 管理员接口
+    post:
       consumes:
       - application/json
       description: Admin 修改密码接口
@@ -105,4 +164,67 @@ paths:
       summary: Admin Log out
       tags:
       - 管理员接口
+  /service/delete:
+    get:
+      consumes:
+      - application/json
+      description: 删除一个服务
+      operationId: /service/delete
+      parameters:
+      - description: 服务 ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete service
+      tags:
+      - 服务管理
+  /service/service_list:
+    get:
+      consumes:
+      - application/json
+      description: 服务列表
+      operationId: /service/service_list
+      parameters:
+      - description: 关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 每页个数
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      - description: 总页数
+        in: query
+        name: page_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceListOutput'
+              type: object
+      summary: Service List
+      tags:
+      - 服务管理
 swagger: "2.0"

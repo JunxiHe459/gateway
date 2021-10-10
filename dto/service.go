@@ -5,12 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ServiceListInput struct {
-	Keyword    string `json:"keyword" form:"keyword" validate:""`
-	PageNumber int    `json:"page_number" form:"page_number" validate:"required"`
-	PageSize   int    `json:"page_size" form:"page_size" validate:"required"`
-}
-
 type SingleService struct {
 	ID             int64  `json:"id" form:"id"`                        //id
 	ServiceName    string `json:"service_name" form:"service_name"`    //服务名称
@@ -22,11 +16,25 @@ type SingleService struct {
 	TotalNode      int    `json:"total_node" form:"total_node"`        //节点数
 }
 
+type ServiceListInput struct {
+	Keyword    string `json:"keyword" form:"keyword" validate:""`
+	PageNumber int    `json:"page_number" form:"page_number" validate:"required"`
+	PageSize   int    `json:"page_size" form:"page_size" validate:"required"`
+}
+
 type ServiceListOutput struct {
 	TotalServices int64           `json:"total_services" form:"total_services" validate:"required"`
 	ServiceList   []SingleService `json:"service_list" form:"service_list" validate:"required"`
 }
 
+type ServiceDeleteInput struct {
+	ID int64 `json:"id" form:"id" validate:"required"`
+}
+
 func (param *ServiceListInput) BindParam(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, param)
+}
+
+func (param *ServiceDeleteInput) BindParam(c *gin.Context) error {
 	return public.DefaultGetValidParams(c, param)
 }

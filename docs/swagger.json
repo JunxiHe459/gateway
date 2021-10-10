@@ -6,6 +6,40 @@
     "paths": {
         "/admin/info": {
             "get": {
+                "description": "Admin Info 接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员接口"
+                ],
+                "summary": "Admin Info",
+                "operationId": "/admin/info",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AdminLoginOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
                 "description": "Admin 修改密码接口",
                 "consumes": [
                     "application/json"
@@ -122,6 +156,109 @@
                     }
                 }
             }
+        },
+        "/service/delete": {
+            "get": {
+                "description": "删除一个服务",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务管理"
+                ],
+                "summary": "Delete service",
+                "operationId": "/service/delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "服务 ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/service/service_list": {
+            "get": {
+                "description": "服务列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务管理"
+                ],
+                "summary": "Service List",
+                "operationId": "/service/service_list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页个数",
+                        "name": "page_size",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "总页数",
+                        "name": "page_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ServiceListOutput"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -148,6 +285,61 @@
             "properties": {
                 "token": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.ServiceListOutput": {
+            "type": "object",
+            "required": [
+                "service_list",
+                "total_services"
+            ],
+            "properties": {
+                "service_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SingleService"
+                    }
+                },
+                "total_services": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SingleService": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "id",
+                    "type": "integer"
+                },
+                "load_type": {
+                    "description": "类型",
+                    "type": "integer"
+                },
+                "qpd": {
+                    "description": "qpd",
+                    "type": "integer"
+                },
+                "qps": {
+                    "description": "qps",
+                    "type": "integer"
+                },
+                "service_address": {
+                    "description": "服务地址",
+                    "type": "string"
+                },
+                "service_desc": {
+                    "description": "服务描述",
+                    "type": "string"
+                },
+                "service_name": {
+                    "description": "服务名称",
+                    "type": "string"
+                },
+                "total_node": {
+                    "description": "节点数",
+                    "type": "integer"
                 }
             }
         },

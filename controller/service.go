@@ -17,6 +17,7 @@ type ServiceController struct {
 func RegiterService(group *gin.RouterGroup) {
 	service := &ServiceController{}
 	group.GET("/service_list", service.ServiceList)
+	group.GET("delete", service.DeleteService)
 }
 
 // Service godoc
@@ -112,8 +113,54 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 
 	// 绑定响应
 	out := &dto.ServiceListOutput{
-		total,
-		serviceList,
+		TotalServices: total,
+		ServiceList:   serviceList,
 	}
 	middleware.ResponseSuccess(c, out)
+}
+
+// Service godoc
+// @Summary Delete service
+// @Description 删除一个服务
+// @Tags 服务管理
+// @ID /service/delete
+// @Accept json
+// @Produce json
+// @Param id query int true "服务 ID"
+// @Success 200 {object} middleware.Response{data=string} "success"
+// @Router /service/delete [GET]
+func (s *ServiceController) DeleteService(c *gin.Context) {
+	params := dto.ServiceDeleteInput{}
+	err := params.BindParam(c)
+	if err != nil {
+		println("Bind Params Error: ", err.Error())
+		middleware.ResponseError(c, 400, err)
+	}
+
+	service := &dao.ServiceInfo{
+		ID: params.ID,
+	}
+	// Find Service
+	service, err = service.Find(c, global.DB, service)
+	if err != nil {
+		println("Find Service Error: ", err.Error())
+		middleware.ResponseError(c, 2000, err)
+	}
+
+	// 硬删除
+	//err = service.Delete(c, global.DB)
+	//if err != nil{
+	//	println("Delete Service Error: ", err.Error())
+	//	middleware.ResponseError(c, 2001, err)
+	//}
+
+	// 软删除
+	service.IsDelete = 1
+	err = service.Save(c, global.DB)
+	if err != nil {
+		println("Save Service Error: ", err.Error())
+		middleware.ResponseError(c, 2001, err)
+	}
+
+	middleware.ResponseSuccess(c, "Deleted")
 }

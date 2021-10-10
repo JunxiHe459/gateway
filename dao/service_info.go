@@ -41,6 +41,16 @@ func (service *ServiceInfo) Save(c *gin.Context, db *gorm.DB) error {
 	return nil
 }
 
+// 硬删除，最好别用
+func (service *ServiceInfo) Delete(c *gin.Context, db *gorm.DB) error {
+	err := db.SetCtx(public.GetGinTraceContext(c)).Delete(service).Error
+	if err != nil {
+		print(err.Error())
+		return err
+	}
+	return nil
+}
+
 func (service *ServiceInfo) GetPageList(c *gin.Context, db *gorm.DB, param *dto.ServiceListInput) (list []ServiceInfo, total int64, err error) {
 	offset := (param.PageNumber - 1) * param.PageNumber
 	query := db.SetCtx(public.GetGinTraceContext(c)).Table(service.TableName()).Where("is_delete=0")
