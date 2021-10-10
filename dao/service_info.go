@@ -61,6 +61,46 @@ func (service *ServiceInfo) GetPageList(c *gin.Context, db *gorm.DB, param *dto.
 	return
 }
 
-func (service *ServiceInfo) GetServiceDetail(c *gin.Context, db *gorm.DB, info ServiceInfo) {
+func (service *ServiceInfo) GetServiceDetail(c *gin.Context, db *gorm.DB, info *ServiceInfo) (detail *ServiceDetail, err error) {
+	http := &HttpRule{ServiceID: info.ID}
+	http, err = http.Find(c, db, http)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return
+	}
+
+	tcp := &TcpRule{ServiceID: info.ID}
+	tcp, err = tcp.Find(c, db, tcp)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return
+	}
+
+	grpc := &GrpcRule{ServiceID: info.ID}
+	grpc, err = grpc.Find(c, db, grpc)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return
+	}
+
+	access := &AccessControl{ServiceID: info.ID}
+	access, err = access.Find(c, db, access)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return
+	}
+
+	loadbalance := &LoadBalance{ServiceID: info.ID}
+	loadbalance, err = loadbalance.Find(c, db, loadbalance)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return
+	}
+
+	detail = &ServiceDetail{
+		Info:          info,
+		HTTPRule:      http,
+		TCPRule:       tcp,
+		GRPCRule:      grpc,
+		AccessControl: access,
+		LoadBalance:   loadbalance,
+	}
+
+	return
 
 }
