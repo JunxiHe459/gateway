@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/JunxiHe459/gateway/dao"
 	"github.com/JunxiHe459/gateway/dto"
@@ -192,4 +193,14 @@ func (s *ServiceController) AddHTTPService(c *gin.Context) {
 		}
 	}
 
+	// 查看有没有重复的 ServiceName
+	serviceInfo := &dao.ServiceInfo{
+		ServiceName: params.ServiceName,
+	}
+	serviceInfo, err = serviceInfo.Find(c, global.DB, serviceInfo)
+	if err == nil {
+		println("Service Already Exists: ", err.Error())
+		middleware.ResponseError(c, 400, errors.New("Service Already Exists"))
+		return
+	}
 }
