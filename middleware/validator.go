@@ -55,8 +55,8 @@ func ParamValidationMiddleware() gin.HandlerFunc {
 				return fl.Field().String() == "admin"
 			})
 
-			_ = val.RegisterValidation("valid_servicename", func(fl validator.FieldLevel) bool {
-				flag, err := regexp.Match(`^[a-zA-Z0-9_]{6,128}$`, fl.Field().Bytes())
+			_ = val.RegisterValidation("valid_service_name", func(fl validator.FieldLevel) bool {
+				flag, err := regexp.Match(`^[a-zA-Z0-9_-]{6,128}$`, []byte(fl.Field().String()))
 				if err != nil {
 					println("regexp.Math error: ", err.Error())
 					return false
@@ -66,7 +66,7 @@ func ParamValidationMiddleware() gin.HandlerFunc {
 
 			// 验证 rule 接入方式 不能为空
 			_ = val.RegisterValidation("valid_rule", func(fl validator.FieldLevel) bool {
-				flag, err := regexp.Match(`^\S+$`, fl.Field().Bytes())
+				flag, err := regexp.Match(`^\S+$`, []byte(fl.Field().String()))
 				if err != nil {
 					println("regexp.Math error: ", err.Error())
 					return false

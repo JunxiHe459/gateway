@@ -9,7 +9,9 @@ import (
 	"github.com/JunxiHe459/gateway/middleware"
 	"github.com/JunxiHe459/gateway/public"
 	"github.com/e421083458/golang_common/lib"
+	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 type ServiceController struct {
@@ -193,14 +195,111 @@ func (s *ServiceController) AddHTTPService(c *gin.Context) {
 		}
 	}
 
+	tx := global.DB
+	tx.Begin()
 	// 查看有没有重复的 ServiceName
 	serviceInfo := &dao.ServiceInfo{
 		ServiceName: params.ServiceName,
 	}
-	serviceInfo, err = serviceInfo.Find(c, global.DB, serviceInfo)
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err == nil {
+		tx.Rollback()
 		println("Service Already Exists: ", err.Error())
 		middleware.ResponseError(c, 400, errors.New("Service Already Exists"))
 		return
 	}
+
+	// 查看有无重复前缀 或 域名
+	httpService := &dao.HttpRule{
+		RuleType: params.RuleType,
+		Rule:     params.Rule,
+	}
+	_, err = httpService.Find(c, tx, httpService)
+	if err != gorm.ErrRecordNotFound {
+		tx.Rollback()
+		println("Http url or domain name Already Exists: ", err.Error())
+		middleware.ResponseError(c, 400, errors.New("Http url or domain name Already Exists"))
+		return
+	}
+
+	if len(strings.Split(params.IpList, ",")) != len(strings.Split(params.WeightList, ",")) {
+		tx.Rollback()
+		println("IP list should have same length as weight list: ", err.Error())
+		middleware.ResponseError(c, 400, errors.New("IP list should have same length as weight list"))
+		return
+	}
+
+	// 创建 service 本体到 serviceinfo 中
+	serviceinfo := &dao.ServiceInfo{
+		ServiceName: params.ServiceName,
+		ServiceDesc: params.ServiceDesc,
+	}
+	err = serviceinfo.Save(c, tx)
+	if err != nil {
+		tx.Rollback()
+		println("Save service info error: ", err.Error())
+		middleware.ResponseError(c, 400, errors.New("Save service info error"))
+		return
+	}
+
+	// id 作为 foreign key 去关联其他表
+	id := serviceinfo.ID
+
+	// 关联 http_rule
+	httpRule := &dao.HttpRule{
+		ServiceID:      id,
+		RuleType:       params.RuleType,
+		NeedHttps:      params.NeedHttps,
+		NeedStripUri:   params.NeedStripUri,
+		NeedWebsocket:  params.NeedWebsocket,
+		UrlRewrite:     params.UrlRewrite,
+		HeaderTransfer: params.HeaderTransfer,
+	}
+	err = httpRule.Save(c, tx)
+	if err != nil {
+		tx.Rollback()
+		println("Save http rule error: ", err.Error())
+		middleware.ResponseError(c, 400, errors.New("Save http rule error"))
+		return
+	}
+
+	// 关联 access_control
+	accessControl := &dao.AccessControl{
+		ServiceID:         id,
+		OpenAuth:          params.OpenAuth,
+		BlackList:         params.BlackList,
+		WhiteList:         params.WhiteList,
+		ClientIPFlowLimit: params.ClientIPFlowLimit,
+		ServiceFlowLimit:  params.ServiceFlowLimit,
+	}
+	err = accessControl.Save(c, tx)
+	if err != nil {
+		tx.Rollback()
+		println("Save access conrol error: ", err.Error())
+		middleware.ResponseError(c, 400, errors.New("Save access conrol error"))
+		return
+	}
+
+	// 关联 load_balance
+	loadbalance := &dao.LoadBalance{
+		ServiceID:              id,
+		RoundType:              params.RoundType,
+		IpList:                 params.IpList,
+		WeightList:             params.WeightList,
+		UpstreamConnectTimeout: params.UpstreamConnectTimeout,
+		UpstreamHeaderTimeout:  params.UpstreamHeaderTimeout,
+		UpstreamIdleTimeout:    params.UpstreamIdleTimeout,
+		UpstreamMaxIdle:        params.UpstreamMaxIdle,
+	}
+	err = loadbalance.Save(c, tx)
+	if err != nil {
+		tx.Rollback()
+		println("Save load balance error: ", err.Error())
+		middleware.ResponseError(c, 400, errors.New("Save load balance error"))
+		return
+	}
+
+	// 提交事务
+	tx.Commit()
+	middleware.ResponseSuccess(c, "New HTTP serviced added")
 }
