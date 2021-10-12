@@ -209,7 +209,7 @@ func (s *ServiceController) AddHTTPService(c *gin.Context) {
 		ServiceName: params.ServiceName,
 	}
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
-	if err == gorm.ErrRecordNotFound {
+	if err != gorm.ErrRecordNotFound {
 		//gorm.ErrRecordNotFound
 		tx.Rollback()
 		println("Service Already Exists")
@@ -325,7 +325,7 @@ func (s *ServiceController) AddHTTPService(c *gin.Context) {
 // @Success 200 {object} middleware.Response{data=dto.ServiceListOutput} "success"
 // @Router /service/add_http [POST]
 func (s *ServiceController) UpdateHTTPService(c *gin.Context) {
-	params := &dto.ServiceAddHTTPInput{}
+	params := &dto.ServiceUpdateHTTPInput{}
 	err := params.BindParam(c)
 	if err != nil {
 		if err != nil {
@@ -351,8 +351,9 @@ func (s *ServiceController) UpdateHTTPService(c *gin.Context) {
 
 	// 查看有没有 ServiceName
 	serviceInfo := &dao.ServiceInfo{
-		ServiceName: params.ServiceName,
+		ID: params.ID,
 	}
+
 	serviceDetail, err := serviceInfo.GetServiceDetail(c, tx, serviceInfo)
 	if err != nil {
 		//gorm.ErrRecordNotFound
@@ -362,73 +363,90 @@ func (s *ServiceController) UpdateHTTPService(c *gin.Context) {
 		return
 	}
 
-	// 创建 service 本体到 serviceinfo 中
-	serviceinfo := &dao.ServiceInfo{
-		ServiceName: params.ServiceName,
-		ServiceDesc: params.ServiceDesc,
-	}
-	err = serviceinfo.Save(c, tx)
-	if err != nil {
-		tx.Rollback()
-		println("Save service info error: ", err.Error())
-		middleware.ResponseError(c, 400, errors.New("Save service info error"))
-		return
-	}
-
-	//httpRule := serviceDetail.HTTPRule
-	//accessControl := serviceDetail.AccessControl
-	//loadBalance := serviceDetail.LoadBalance
-	serviceDetail.HTTPRule = &dao.HttpRule{
-		RuleType:       params.RuleType,
-		NeedHttps:      params.NeedHttps,
-		NeedStripUri:   params.NeedStripUri,
-		NeedWebsocket:  params.NeedWebsocket,
-		UrlRewrite:     params.UrlRewrite,
-		HeaderTransfer: params.HeaderTransfer,
-	}
-	err = serviceDetail.HTTPRule.Save(c, tx)
-	if err != nil {
+	httpRule := serviceDetail.HTTPRule
+	httpRule.RuleType = params.RuleType
+	httpRule.Rule = params.Rule
+	httpRule.NeedHttps = params.NeedHttps
+	httpRule.NeedStripUri = params.NeedStripUri
+	httpRule.NeedWebsocket = params.NeedWebsocket
+	httpRule.UrlRewrite = params.UrlRewrite
+	httpRule.HeaderTransfer = params.HeaderTransfer
+	if err := httpRule.Save(c, tx); err != nil {
 		tx.Rollback()
 		println("Save http rule error: ", err.Error())
-		middleware.ResponseError(c, 400, errors.New("Save service info error"))
+		middleware.ResponseError(c, 400, err)
 		return
 	}
 
-	// 关联 access_control
-	serviceDetail.AccessControl = &dao.AccessControl{
-		OpenAuth:          params.OpenAuth,
-		BlackList:         params.BlackList,
-		WhiteList:         params.WhiteList,
-		ClientIPFlowLimit: params.ClientIPFlowLimit,
-		ServiceFlowLimit:  params.ServiceFlowLimit,
-	}
-	err = serviceDetail.AccessControl.Save(c, tx)
-	if err != nil {
+	accessControl := serviceDetail.AccessControl
+	accessControl.OpenAuth = params.OpenAuth
+	accessControl.BlackList = params.BlackList
+	accessControl.WhiteList = params.WhiteList
+	accessControl.ClientIPFlowLimit = params.ClientIPFlowLimit
+	accessControl.ServiceFlowLimit = params.ServiceFlowLimit
+	if err := accessControl.Save(c, tx); err != nil {
 		tx.Rollback()
 		println("Save access control error: ", err.Error())
-		middleware.ResponseError(c, 400, errors.New("Save access control error"))
+		middleware.ResponseError(c, 400, err)
 		return
 	}
 
-	// 关联 load_balance
-	serviceDetail.LoadBalance = &dao.LoadBalance{
-		RoundType:              params.RoundType,
-		IpList:                 params.IpList,
-		WeightList:             params.WeightList,
-		UpstreamConnectTimeout: params.UpstreamConnectTimeout,
-		UpstreamHeaderTimeout:  params.UpstreamHeaderTimeout,
-		UpstreamIdleTimeout:    params.UpstreamIdleTimeout,
-		UpstreamMaxIdle:        params.UpstreamMaxIdle,
-	}
-	err = serviceDetail.LoadBalance.Save(c, tx)
-	if err != nil {
+	loadbalance := serviceDetail.LoadBalance
+	loadbalance.RoundType = params.RoundType
+	loadbalance.IpList = params.IpList
+	loadbalance.WeightList = params.WeightList
+	loadbalance.UpstreamConnectTimeout = params.UpstreamConnectTimeout
+	loadbalance.UpstreamHeaderTimeout = params.UpstreamHeaderTimeout
+	loadbalance.UpstreamIdleTimeout = params.UpstreamIdleTimeout
+	loadbalance.UpstreamMaxIdle = params.UpstreamMaxIdle
+	if err := loadbalance.Save(c, tx); err != nil {
 		tx.Rollback()
 		println("Save load balance error: ", err.Error())
-		middleware.ResponseError(c, 400, errors.New("Save load balance error"))
+		middleware.ResponseError(c, 400, err)
 		return
 	}
 
 	// 提交事务
 	tx.Commit()
-	middleware.ResponseSuccess(c, "New HTTP serviced added")
+	middleware.ResponseSuccess(c, "Update HTTP serviced added")
+}
+
+// Service godoc
+// @Summary Details of a service
+// @Description 服务详情
+// @Tags 服务管理
+// @ID /service/service_detail
+// @Accept json
+// @Produce json
+// @Param body body dto.ServiceAddHTTPInput true "body"
+// @Success 200 {object} middleware.Response{data=dao.ServiceDetail} "success"
+// @Router /service/add_http [GET]
+func (service *ServiceController) ServiceDetail(c *gin.Context) {
+	params := &dto.ServiceDeleteInput{}
+	if err := params.BindParam(c); err != nil {
+		middleware.ResponseError(c, 400, err)
+		return
+	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+
+	//读取基本信息
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
+	if err != nil {
+		println("Find Service Info error: ", err.Error())
+		middleware.ResponseError(c, 400, err)
+		return
+	}
+	serviceDetail, err := serviceInfo.GetServiceDetail(c, tx, serviceInfo)
+	if err != nil {
+		println("Get service detail error: ", err.Error())
+		middleware.ResponseError(c, 400, err)
+		return
+	}
+	middleware.ResponseSuccess(c, serviceDetail)
 }

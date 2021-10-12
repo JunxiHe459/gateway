@@ -60,7 +60,7 @@ type ServiceAddHTTPInput struct {
 }
 
 type ServiceUpdateHTTPInput struct {
-	ServiceID   string `json:"id" form:"id"`
+	ID          int64  `json:"id" form:"id" validate:"required"`
 	ServiceName string `json:"service_name" form:"service_name" comment:"服务名" example:"" validate:"required,valid_service_name"` //服务名
 	ServiceDesc string `json:"service_desc" form:"service_desc" comment:"服务描述" example:"" validate:"required,max=255,min=1"`     //服务描述
 
@@ -96,5 +96,9 @@ func (param *ServiceDeleteInput) BindParam(c *gin.Context) error {
 }
 
 func (param *ServiceAddHTTPInput) BindParam(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, param)
+}
+
+func (param *ServiceUpdateHTTPInput) BindParam(c *gin.Context) error {
 	return public.DefaultGetValidParams(c, param)
 }
