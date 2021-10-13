@@ -2,6 +2,7 @@ package dao
 
 import (
 	"github.com/JunxiHe459/gateway/dto"
+	"github.com/JunxiHe459/gateway/global"
 	"github.com/JunxiHe459/gateway/public"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
@@ -72,6 +73,14 @@ func (service *ServiceInfo) GetPageList(c *gin.Context, db *gorm.DB, param *dto.
 }
 
 func (service *ServiceInfo) GetServiceDetail(c *gin.Context, db *gorm.DB, info *ServiceInfo) (detail *ServiceDetail, err error) {
+	if info.ServiceName == "" {
+		search, err := service.Find(c, global.DB, info)
+		if err != nil {
+			return nil, err
+		}
+		info = search
+	}
+
 	http := &HttpRule{ServiceID: info.ID}
 	http, err = http.Find(c, db, http)
 	if err != nil && err != gorm.ErrRecordNotFound {
