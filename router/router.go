@@ -128,7 +128,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.SessionAuthMiddleware(),
 		middleware.ParamValidationMiddleware(),
 	)
-	controller.RegiterService(serviceGroup)
+	controller.RegisterService(serviceGroup)
 
 	return router
 
