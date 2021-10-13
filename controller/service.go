@@ -27,6 +27,8 @@ func RegisterService(group *gin.RouterGroup) {
 	group.POST("update_http", service.UpdateHTTPService)
 	group.POST("add_tcp", service.ServiceAddTcp)
 	group.POST("update_tcp", service.ServiceUpdateTcp)
+	group.POST("add_grpc", service.ServiceAddGRPC)
+	group.POST("update_grpc", service.ServiceUpdateGRPC)
 
 	group.GET("service_details", service.ServiceDetail)
 }
@@ -714,7 +716,7 @@ func (admin *ServiceController) ServiceUpdateTcp(c *gin.Context) {
 // @Param body body dto.ServiceAddGrpcInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_add_grpc [post]
-func (admin *ServiceController) ServiceAddGrpc(c *gin.Context) {
+func (admin *ServiceController) ServiceAddGRPC(c *gin.Context) {
 	params := &dto.ServiceAddGrpcInput{}
 	if err := params.GetValidParams(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
@@ -818,7 +820,7 @@ func (admin *ServiceController) ServiceAddGrpc(c *gin.Context) {
 // @Param body body dto.ServiceUpdateGrpcInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_update_grpc [post]
-func (admin *ServiceController) ServiceUpdateGrpc(c *gin.Context) {
+func (admin *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
 	params := &dto.ServiceUpdateGrpcInput{}
 	if err := params.GetValidParams(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
