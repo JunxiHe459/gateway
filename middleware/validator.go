@@ -98,6 +98,15 @@ func ParamValidationMiddleware() gin.HandlerFunc {
 				return true
 			})
 
+			val.RegisterValidation("valid_ipportlist", func(fl validator.FieldLevel) bool {
+				for _, ms := range strings.Split(fl.Field().String(), ",") {
+					if matched, _ := regexp.Match(`^\S+\:\d+$`, []byte(ms)); !matched {
+						return false
+					}
+				}
+				return true
+			})
+
 			val.RegisterValidation("valid_iplist", func(fl validator.FieldLevel) bool {
 				if fl.Field().String() == "" {
 					return true
@@ -155,6 +164,13 @@ func ParamValidationMiddleware() gin.HandlerFunc {
 				return ut.Add("valid_rule", "{0} 需要用逗号隔开", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
 				t, _ := ut.T("valid_rule", fe.Field())
+				return t
+			})
+
+			val.RegisterTranslation("valid_ipportlist", trans, func(ut ut.Translator) error {
+				return ut.Add("valid_ipportlist", "{0} 记得加 : 哦", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("valid_ipportlist", fe.Field())
 				return t
 			})
 

@@ -31,6 +31,7 @@ func RegisterService(group *gin.RouterGroup) {
 	group.POST("update_grpc", service.ServiceUpdateGRPC)
 
 	group.GET("service_details", service.ServiceDetail)
+	group.GET("service_stats", service.ServiceStats)
 }
 
 // Service godoc
@@ -433,12 +434,12 @@ func (s *ServiceController) UpdateHTTPService(c *gin.Context) {
 // @Summary Details of a service
 // @Description 服务详情
 // @Tags 服务管理
-// @ID /service/service_detail
+// @ID /service/service_details
 // @Accept json
 // @Produce json
-// @Param body body dto.ServiceAddHTTPInput true "body"
+// @Param ID query int true "ID"
 // @Success 200 {object} middleware.Response{data=dao.ServiceDetail} "success"
-// @Router /service/add_http [GET]
+// @Router /service/service_details [GET]
 func (service *ServiceController) ServiceDetail(c *gin.Context) {
 	params := &dto.ServiceDeleteInput{}
 	if err := params.BindParam(c); err != nil {
@@ -470,15 +471,15 @@ func (service *ServiceController) ServiceDetail(c *gin.Context) {
 }
 
 // Service godoc
-// @Summary Details of a service
-// @Description 服务详情
+// @Summary Network Flow statistics
+// @Description 流量数据
 // @Tags 服务管理
 // @ID /service/service_detail
 // @Accept json
 // @Produce json
-// @Param body body dto.ServiceAddHTTPInput true "body"
+// @Param ID query int true "ID"
 // @Success 200 {object} middleware.Response{data=dto.ServiceStatsOutput} "success"
-// @Router /service/add_http [GET]
+// @Router /service/service_stats [GET]
 func (service *ServiceController) ServiceStats(c *gin.Context) {
 	params := &dto.ServiceDeleteInput{}
 	err := params.BindParam(c)
@@ -515,7 +516,7 @@ func (service *ServiceController) ServiceStats(c *gin.Context) {
 }
 
 // ServiceAddHttp godoc
-// @Summary tcp服务添加
+// @Summary Add a new TCP service
 // @Description tcp服务添加
 // @Tags 服务管理
 // @ID /service/service_add_tcp
@@ -523,7 +524,7 @@ func (service *ServiceController) ServiceStats(c *gin.Context) {
 // @Produce  json
 // @Param body body dto.ServiceAddTcpInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
-// @Router /service/service_add_tcp [post]
+// @Router /service/add_tcp [post]
 func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 	params := &dto.ServiceAddTcpInput{}
 	if err := params.GetValidParams(c); err != nil {
@@ -617,7 +618,7 @@ func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 }
 
 // ServiceUpdateTcp godoc
-// @Summary tcp服务更新
+// @Summary Update an existing TCP service
 // @Description tcp服务更新
 // @Tags 服务管理
 // @ID /service/service_update_tcp
@@ -625,7 +626,7 @@ func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 // @Produce  json
 // @Param body body dto.ServiceUpdateTcpInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
-// @Router /service/service_update_tcp [post]
+// @Router /service/update_tcp [post]
 func (admin *ServiceController) ServiceUpdateTcp(c *gin.Context) {
 	params := &dto.ServiceUpdateTcpInput{}
 	if err := params.GetValidParams(c); err != nil {
@@ -707,7 +708,7 @@ func (admin *ServiceController) ServiceUpdateTcp(c *gin.Context) {
 }
 
 // ServiceAddHttp godoc
-// @Summary grpc服务添加
+// @Summary Add a new GRPC service
 // @Description grpc服务添加
 // @Tags 服务管理
 // @ID /service/service_add_grpc
@@ -715,7 +716,7 @@ func (admin *ServiceController) ServiceUpdateTcp(c *gin.Context) {
 // @Produce  json
 // @Param body body dto.ServiceAddGrpcInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
-// @Router /service/service_add_grpc [post]
+// @Router /service/add_grpc [post]
 func (admin *ServiceController) ServiceAddGRPC(c *gin.Context) {
 	params := &dto.ServiceAddGrpcInput{}
 	if err := params.GetValidParams(c); err != nil {
@@ -811,7 +812,7 @@ func (admin *ServiceController) ServiceAddGRPC(c *gin.Context) {
 }
 
 // ServiceUpdateTcp godoc
-// @Summary grpc服务更新
+// @Summary Update an existing GRPC service
 // @Description grpc服务更新
 // @Tags 服务管理
 // @ID /service/service_update_grpc
@@ -819,7 +820,7 @@ func (admin *ServiceController) ServiceAddGRPC(c *gin.Context) {
 // @Produce  json
 // @Param body body dto.ServiceUpdateGrpcInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
-// @Router /service/service_update_grpc [post]
+// @Router /service/update_grpc [post]
 func (admin *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
 	params := &dto.ServiceUpdateGrpcInput{}
 	if err := params.GetValidParams(c); err != nil {

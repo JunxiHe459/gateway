@@ -131,7 +131,7 @@ type ServiceAddGrpcInput struct {
 	ServiceName       string `json:"service_name" form:"service_name" comment:"服务名称" validate:"required,valid_service_name"`
 	ServiceDesc       string `json:"service_desc" form:"service_desc" comment:"服务描述" validate:"required"`
 	Port              int    `json:"port" form:"port" comment:"端口，需要设置8001-8999范围内" validate:"required,min=8001,max=8999"`
-	HeaderTransfer    string `json:"header_transfer" form:"header_transfer" comment:"metadata转换" validate:"valid_header_transfer"`
+	HeaderTransfer    string `json:"header_transfer" form:"header_transfer" comment:"header_transfer" validate:"valid_header_transfer"`
 	OpenAuth          int    `json:"open_auth" form:"open_auth" comment:"是否开启权限验证" validate:""`
 	BlackList         string `json:"black_list" form:"black_list" comment:"黑名单IP，以逗号间隔，白名单优先级高于黑名单" validate:"valid_iplist"`
 	WhiteList         string `json:"white_list" form:"white_list" comment:"白名单IP，以逗号间隔，白名单优先级高于黑名单" validate:"valid_iplist"`

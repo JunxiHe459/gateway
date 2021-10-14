@@ -130,6 +130,16 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	)
 	controller.RegisterService(serviceGroup)
 
+	renterGroup := router.Group("/renter")
+	renterGroup.Use(
+		sessions.Sessions("mysession", redis),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.ParamValidationMiddleware())
+
+	controller.RenterRegister(renterGroup)
+
 	return router
 
 }
