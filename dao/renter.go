@@ -41,10 +41,10 @@ func (t *Renter) Save(c *gin.Context, tx *gorm.DB) error {
 	return nil
 }
 
-func (t *Renter) RenterList(c *gin.Context, tx *gorm.DB, params *dto.RenterListInput) ([]Renter, int64, error) {
+func (t *Renter) GetRenterList(c *gin.Context, tx *gorm.DB, params *dto.RenterListInput) ([]Renter, int64, error) {
 	var list []Renter
 	var count int64
-	pageNo := params.PageNo
+	pageNo := params.PageNumber
 	pageSize := params.PageSize
 
 	//limit offset,pagesize
@@ -102,8 +102,8 @@ func (s *RenterManager) LoadOnce() error {
 			s.err = err
 			return
 		}
-		params := &dto.RenterListInput{PageNo: 1, PageSize: 99999}
-		list, _, err := renterInfo.RenterList(c, tx, params)
+		params := &dto.RenterListInput{PageNumber: 1, PageSize: 99999}
+		list, _, err := renterInfo.GetRenterList(c, tx, params)
 		if err != nil {
 			s.err = err
 			return

@@ -88,8 +88,8 @@ type ServiceUpdateHTTPInput struct {
 }
 
 type ServiceStatsOutput struct {
-	Today     []int   `json:"today" form:"today"`
-	Yesterday [24]int `json:"yesterday" form:"yesterday"`
+	Today     []int `json:"today" form:"today"`
+	Yesterday []int `json:"yesterday" form:"yesterday"`
 }
 
 type ServiceAddTcpInput struct {

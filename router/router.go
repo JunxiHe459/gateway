@@ -136,9 +136,19 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.SessionAuthMiddleware(),
-		middleware.ParamValidationMiddleware())
-
+		middleware.ParamValidationMiddleware(),
+	)
 	controller.RenterRegister(renterGroup)
+
+	dashRouter := router.Group("/dashboard")
+	dashRouter.Use(
+		sessions.Sessions("mysession", redis),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.ParamValidationMiddleware(),
+	)
+	controller.DashboardRegister(dashRouter)
 
 	return router
 

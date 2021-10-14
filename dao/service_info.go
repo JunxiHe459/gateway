@@ -121,5 +121,14 @@ func (service *ServiceInfo) GetServiceDetail(c *gin.Context, db *gorm.DB, info *
 	}
 
 	return
+}
 
+func (service *ServiceInfo) GroupByLoadType(c *gin.Context, db *gorm.DB) (list []dto.DashServiceStatItemOutput, err error) {
+	err = db.SetCtx(public.GetGinTraceContext(c)).Table(service.TableName()).Where(
+		"is_delete=0").Select("load_type as name, count(*) as value").Group(
+		"load_type").Scan(&list).Error
+	if err != nil {
+		return nil, err
+	}
+	return list, err
 }

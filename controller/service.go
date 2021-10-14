@@ -507,11 +507,11 @@ func (service *ServiceController) ServiceStats(c *gin.Context) {
 	for i := 0; i <= time.Now().Hour(); i++ {
 		today = append(today, 0)
 	}
-	var yesterday [24]int
+	//var yesterday [24]int
 
 	middleware.ResponseSuccess(c, &dto.ServiceStatsOutput{
-		Today:     today,
-		Yesterday: yesterday,
+		Today: today,
+		//Yesterday: yesterday,
 	})
 }
 

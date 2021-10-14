@@ -7,12 +7,12 @@ import (
 )
 
 type RenterListInput struct {
-	Info     string `json:"info" form:"info" comment:"查找信息" validate:""`
-	PageSize int    `json:"page_size" form:"page_size" comment:"页数" validate:"required,min=1,max=999"`
-	PageNo   int    `json:"page_no" form:"page_no" comment:"页码" validate:"required,min=1,max=999"`
+	Info       string `json:"info" form:"info" comment:"查找信息" validate:""`
+	PageSize   int    `json:"page_size" form:"page_size" comment:"页数" validate:"required,min=1,max=999"`
+	PageNumber int    `json:"page_number" form:"page_number" comment:"页码" validate:"required,min=1,max=999"`
 }
 
-type APPListOutput struct {
+type RenterListOutput struct {
 	List  []RenterListItemOutput `json:"list" form:"list" comment:"租户列表"`
 	Total int64                  `json:"total" form:"total" comment:"租户总数"`
 }

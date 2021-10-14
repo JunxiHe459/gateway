@@ -29,14 +29,14 @@ type APPController struct {
 // RenterList godoc
 // @Summary 租户列表
 // @Description 租户列表
-// @Tags 租户管理
+// @Tags Renter Management
 // @ID /renter/renter_list
 // @Accept  json
 // @Produce  json
 // @Param info query string false "关键词"
 // @Param page_size query string true "每页多少条"
 // @Param page_no query string true "页码"
-// @Success 200 {object} middleware.Response{data=dto.APPListOutput} "success"
+// @Success 200 {object} middleware.Response{data=dto.RenterListOutput} "success"
 // @Router /renter/renter_list [get]
 func (admin *APPController) RenterList(c *gin.Context) {
 	params := &dto.RenterListInput{}
@@ -45,7 +45,7 @@ func (admin *APPController) RenterList(c *gin.Context) {
 		return
 	}
 	info := &dao.Renter{}
-	list, total, err := info.RenterList(c, global.DB, params)
+	list, total, err := info.GetRenterList(c, global.DB, params)
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
 		return
@@ -71,7 +71,7 @@ func (admin *APPController) RenterList(c *gin.Context) {
 			RealQps:  appCounter.QPS,
 		})
 	}
-	output := dto.APPListOutput{
+	output := dto.RenterListOutput{
 		List:  outputList,
 		Total: total,
 	}
@@ -82,12 +82,12 @@ func (admin *APPController) RenterList(c *gin.Context) {
 // RenterDetail godoc
 // @Summary 租户详情
 // @Description 租户详情
-// @Tags 租户管理
+// @Tags Renter Management
 // @ID /renter/renter_detail
 // @Accept  json
 // @Produce  json
 // @Param id query string true "租户ID"
-// @Success 200 {object} middleware.Response{data=dao.App} "success"
+// @Success 200 {object} middleware.Response{data=dao.Renter} "success"
 // @Router /renter/renter_detail [get]
 func (admin *APPController) RenterDetail(c *gin.Context) {
 	params := &dto.RenterDetailInput{}
@@ -110,7 +110,7 @@ func (admin *APPController) RenterDetail(c *gin.Context) {
 // DeleteRenter godoc
 // @Summary 租户删除
 // @Description 租户删除
-// @Tags 租户管理
+// @Tags Renter Management
 // @ID /renter/delete_renter
 // @Accept  json
 // @Produce  json
@@ -143,7 +143,7 @@ func (admin *APPController) DeleteRenter(c *gin.Context) {
 // AddRenter godoc
 // @Summary 租户添加
 // @Description 租户添加
-// @Tags 租户管理
+// @Tags Renter Management
 // @ID /renter/add_renter
 // @Accept  json
 // @Produce  json
@@ -188,7 +188,7 @@ func (admin *APPController) AddRenter(c *gin.Context) {
 // UpdateRenter godoc
 // @Summary 租户更新
 // @Description 租户更新
-// @Tags 租户管理
+// @Tags Renter Management
 // @ID /renter/update_renter
 // @Accept  json
 // @Produce  json
@@ -228,7 +228,7 @@ func (admin *APPController) UpdateRenter(c *gin.Context) {
 // RenterStats godoc
 // @Summary 租户统计
 // @Description 租户统计
-// @Tags 租户管理
+// @Tags Renter Management
 // @ID /renter/renter_stat
 // @Accept  json
 // @Produce  json
