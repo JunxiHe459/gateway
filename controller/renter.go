@@ -17,7 +17,7 @@ func RenterRegister(router *gin.RouterGroup) {
 	admin := APPController{}
 	router.GET("/renter_list", admin.RenterList)
 	router.GET("/renter_detail", admin.RenterDetail)
-	router.GET("/renter_stat", admin.RenterStats)
+	router.GET("/renter_stats", admin.RenterStats)
 	router.GET("/delete_renter", admin.DeleteRenter)
 	router.POST("/add_renter", admin.AddRenter)
 	router.POST("/update_renter", admin.UpdateRenter)
@@ -27,7 +27,7 @@ type APPController struct {
 }
 
 // RenterList godoc
-// @Summary 租户列表
+// @Summary Renter list
 // @Description 租户列表
 // @Tags Renter Management
 // @ID /renter/renter_list
@@ -80,7 +80,7 @@ func (admin *APPController) RenterList(c *gin.Context) {
 }
 
 // RenterDetail godoc
-// @Summary 租户详情
+// @Summary Renter Info
 // @Description 租户详情
 // @Tags Renter Management
 // @ID /renter/renter_detail
@@ -108,7 +108,7 @@ func (admin *APPController) RenterDetail(c *gin.Context) {
 }
 
 // DeleteRenter godoc
-// @Summary 租户删除
+// @Summary Delete Renter
 // @Description 租户删除
 // @Tags Renter Management
 // @ID /renter/delete_renter
@@ -141,7 +141,7 @@ func (admin *APPController) DeleteRenter(c *gin.Context) {
 }
 
 // AddRenter godoc
-// @Summary 租户添加
+// @Summary Add Renter
 // @Description 租户添加
 // @Tags Renter Management
 // @ID /renter/add_renter
@@ -186,7 +186,7 @@ func (admin *APPController) AddRenter(c *gin.Context) {
 }
 
 // UpdateRenter godoc
-// @Summary 租户更新
+// @Summary Update Renter
 // @Description 租户更新
 // @Tags Renter Management
 // @ID /renter/update_renter
@@ -226,15 +226,15 @@ func (admin *APPController) UpdateRenter(c *gin.Context) {
 }
 
 // RenterStats godoc
-// @Summary 租户统计
+// @Summary Renter Stats
 // @Description 租户统计
 // @Tags Renter Management
-// @ID /renter/renter_stat
+// @ID /renter/renter_stats
 // @Accept  json
 // @Produce  json
 // @Param id query string true "租户ID"
 // @Success 200 {object} middleware.Response{data=dto.StatisticsOutput} "success"
-// @Router /renter/renter_stat [get]
+// @Router /renter/renter_stats [get]
 func (admin *APPController) RenterStats(c *gin.Context) {
 	params := &dto.RenterDetailInput{}
 	if err := params.BindParam(c); err != nil {

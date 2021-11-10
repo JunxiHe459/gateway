@@ -132,7 +132,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	renterGroup := router.Group("/renter")
 	renterGroup.Use(
-		sessions.Sessions("mysession", redis),
+		sessions.Sessions("AdminSession", redis),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.SessionAuthMiddleware(),
@@ -140,15 +140,15 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	)
 	controller.RenterRegister(renterGroup)
 
-	dashRouter := router.Group("/dashboard")
-	dashRouter.Use(
-		sessions.Sessions("mysession", redis),
+	dashboardGroup := router.Group("/dashboard")
+	dashboardGroup.Use(
+		sessions.Sessions("AdminSession", redis),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.SessionAuthMiddleware(),
 		middleware.ParamValidationMiddleware(),
 	)
-	controller.DashboardRegister(dashRouter)
+	controller.DashboardRegister(dashboardGroup)
 
 	return router
 

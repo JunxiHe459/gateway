@@ -32,6 +32,7 @@ func initConf() {
 func initDB() {
 	var err error
 	global.DB, err = lib.GetGormPool("default")
+	global.DB = global.DB.Debug()
 	if err != nil {
 		print("Get Global Variable DB failed")
 	}

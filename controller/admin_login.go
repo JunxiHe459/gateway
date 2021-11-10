@@ -25,7 +25,7 @@ func RegiterAdmin(group *gin.RouterGroup) {
 // AdminLogin godoc
 // @Summary Admin Login
 // @Description Admin Login 接口
-// @Tags 管理员接口
+// @Tags Admin
 // @ID /admin/login
 // @Accept json
 // @Produce json
@@ -33,6 +33,7 @@ func RegiterAdmin(group *gin.RouterGroup) {
 // @Success 200 {object} middleware.Response{data=dto.AdminLoginOutput} "success"
 // @Router /admin/login [POST]
 func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
+	println("Admin login requested")
 	params := &dto.AdminLoginInput{}
 	err := params.BindParam(c)
 	if err != nil {
@@ -77,7 +78,7 @@ func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 // AdminLogin godoc
 // @Summary Admin Log out
 // @Description Admin Log out 接口
-// @Tags 管理员接口
+// @Tags Admin
 // @ID /admin/logout
 // @Accept json
 // @Produce json

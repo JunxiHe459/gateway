@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"github.com/JunxiHe459/gateway/dto"
 	"github.com/JunxiHe459/gateway/global"
 	"github.com/JunxiHe459/gateway/public"
@@ -25,8 +26,11 @@ func (service *ServiceInfo) TableName() string {
 
 func (service *ServiceInfo) Find(c *gin.Context, db *gorm.DB, search *ServiceInfo) (*ServiceInfo, error) {
 	out := &ServiceInfo{}
-	err := db.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(out).Error
+	fmt.Printf("%+v\n", search)
+	err := db.SetCtx(public.GetGinTraceContext(c)).Where("is_delete = ? AND service_name = ?", 0, search.ServiceName).First(out).Error
+	fmt.Printf("%+v\n", out)
 	if err != nil {
+		println("hahha")
 		print(err.Error())
 		return nil, err
 	}
@@ -125,7 +129,7 @@ func (service *ServiceInfo) GetServiceDetail(c *gin.Context, db *gorm.DB, info *
 
 func (service *ServiceInfo) GroupByLoadType(c *gin.Context, db *gorm.DB) (list []dto.DashServiceStatItemOutput, err error) {
 	err = db.SetCtx(public.GetGinTraceContext(c)).Table(service.TableName()).Where(
-		"is_delete=0").Select("load_type as name, count(*) as value").Group(
+		"is_delete=0").Select("load_type, count(*) as value").Group(
 		"load_type").Scan(&list).Error
 	if err != nil {
 		return nil, err

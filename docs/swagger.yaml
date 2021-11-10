@@ -79,6 +79,29 @@ definitions:
       weight_list:
         type: string
     type: object
+  dao.Renter:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      renter_id:
+        type: string
+      secret:
+        type: string
+      updated_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
   dao.ServiceDetail:
     properties:
       access_control:
@@ -120,6 +143,24 @@ definitions:
       service_id:
         type: integer
     type: object
+  dto.AddRenterHttpInput:
+    properties:
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      renter_id:
+        type: string
+      secret:
+        type: string
+      white_ips:
+        type: string
+    required:
+    - name
+    - renter_id
+    type: object
   dto.AdminLoginInput:
     properties:
       password:
@@ -139,6 +180,73 @@ definitions:
     properties:
       token:
         type: string
+    type: object
+  dto.DashServiceStatItemOutput:
+    properties:
+      load_type:
+        type: integer
+      name:
+        type: string
+      value:
+        type: integer
+    type: object
+  dto.DashServiceStatOutput:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.DashServiceStatItemOutput'
+        type: array
+      legend:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.PanelGroupDataOutput:
+    properties:
+      current_QPS:
+        type: integer
+      renter_num:
+        type: integer
+      service_num:
+        type: integer
+      today_request_num:
+        type: integer
+    type: object
+  dto.RenterListItemOutput:
+    properties:
+      app_id:
+        type: string
+      create_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      real_qpd:
+        type: integer
+      real_qps:
+        type: integer
+      secret:
+        type: string
+      update_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
+  dto.RenterListOutput:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/dto.RenterListItemOutput'
+        type: array
+      total:
+        type: integer
     type: object
   dto.ServiceAddGrpcInput:
     properties:
@@ -414,6 +522,41 @@ definitions:
         description: 节点数
         type: integer
     type: object
+  dto.StatisticsOutput:
+    properties:
+      today:
+        items:
+          type: integer
+        type: array
+      yesterday:
+        items:
+          type: integer
+        type: array
+    required:
+    - today
+    - yesterday
+    type: object
+  dto.UpdateRenterHttpInput:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      renter_id:
+        type: string
+      secret:
+        type: string
+      white_ips:
+        type: string
+    required:
+    - id
+    - name
+    - secret
+    type: object
   middleware.Response:
     properties:
       data:
@@ -450,7 +593,7 @@ paths:
               type: object
       summary: Admin Info
       tags:
-      - 管理员接口
+      - Admin
     post:
       consumes:
       - application/json
@@ -470,7 +613,7 @@ paths:
               type: object
       summary: Admin Change Password
       tags:
-      - 管理员接口
+      - Admin
   /admin/login:
     post:
       consumes:
@@ -498,7 +641,7 @@ paths:
               type: object
       summary: Admin Login
       tags:
-      - 管理员接口
+      - Admin
   /admin/logout:
     get:
       consumes:
@@ -519,7 +662,243 @@ paths:
               type: object
       summary: Admin Log out
       tags:
-      - 管理员接口
+      - Admin
+  /dashboard/flow_stat:
+    get:
+      consumes:
+      - application/json
+      description: 流量统计
+      operationId: /dashboard/flow_stat
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceStatsOutput'
+              type: object
+      summary: Flow Stats
+      tags:
+      - Dashboard
+  /dashboard/panel_group_data:
+    get:
+      consumes:
+      - application/json
+      description: 指标统计
+      operationId: /dashboard/panel_group_data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PanelGroupDataOutput'
+              type: object
+      summary: General Stats
+      tags:
+      - Dashboard
+  /dashboard/service_stat:
+    get:
+      consumes:
+      - application/json
+      description: 服务统计
+      operationId: /dashboard/service_stat
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DashServiceStatOutput'
+              type: object
+      summary: Service Stats
+      tags:
+      - Dashboard
+  /renter/add_renter:
+    post:
+      consumes:
+      - application/json
+      description: 租户添加
+      operationId: /renter/add_renter
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddRenterHttpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Add Renter
+      tags:
+      - Renter Management
+  /renter/delete_renter:
+    get:
+      consumes:
+      - application/json
+      description: 租户删除
+      operationId: /renter/delete_renter
+      parameters:
+      - description: 租户ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Delete Renter
+      tags:
+      - Renter Management
+  /renter/renter_detail:
+    get:
+      consumes:
+      - application/json
+      description: 租户详情
+      operationId: /renter/renter_detail
+      parameters:
+      - description: 租户ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dao.Renter'
+              type: object
+      summary: Renter Info
+      tags:
+      - Renter Management
+  /renter/renter_list:
+    get:
+      consumes:
+      - application/json
+      description: 租户列表
+      operationId: /renter/renter_list
+      parameters:
+      - description: 关键词
+        in: query
+        name: info
+        type: string
+      - description: 每页多少条
+        in: query
+        name: page_size
+        required: true
+        type: string
+      - description: 页码
+        in: query
+        name: page_no
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RenterListOutput'
+              type: object
+      summary: Renter list
+      tags:
+      - Renter Management
+  /renter/renter_stats:
+    get:
+      consumes:
+      - application/json
+      description: 租户统计
+      operationId: /renter/renter_stats
+      parameters:
+      - description: 租户ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.StatisticsOutput'
+              type: object
+      summary: Renter Stats
+      tags:
+      - Renter Management
+  /renter/update_renter:
+    post:
+      consumes:
+      - application/json
+      description: 租户更新
+      operationId: /renter/update_renter
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateRenterHttpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update Renter
+      tags:
+      - Renter Management
   /service/add_grpc:
     post:
       consumes:
@@ -547,13 +926,13 @@ paths:
               type: object
       summary: Add a new GRPC service
       tags:
-      - 服务管理
+      - Service Management
   /service/add_http:
     post:
       consumes:
       - application/json
-      description: 更新一个 HTTP 服务
-      operationId: /service/update_http
+      description: 添加一个新的 HTTP 服务
+      operationId: /service/add_http
       parameters:
       - description: body
         in: body
@@ -573,9 +952,9 @@ paths:
                 data:
                   $ref: '#/definitions/dto.ServiceListOutput'
               type: object
-      summary: Update an existing HTTP Service
+      summary: Add a new HTTP Service
       tags:
-      - 服务管理
+      - Service Management
   /service/add_tcp:
     post:
       consumes:
@@ -603,7 +982,7 @@ paths:
               type: object
       summary: Add a new TCP service
       tags:
-      - 服务管理
+      - Service Management
   /service/delete:
     get:
       consumes:
@@ -630,7 +1009,7 @@ paths:
               type: object
       summary: Delete service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_details:
     get:
       consumes:
@@ -657,7 +1036,7 @@ paths:
               type: object
       summary: Details of a service
       tags:
-      - 服务管理
+      - Service Management
   /service/service_list:
     get:
       consumes:
@@ -693,7 +1072,7 @@ paths:
               type: object
       summary: Service List
       tags:
-      - 服务管理
+      - Service Management
   /service/service_stats:
     get:
       consumes:
@@ -720,7 +1099,7 @@ paths:
               type: object
       summary: Network Flow statistics
       tags:
-      - 服务管理
+      - Service Management
   /service/update_grpc:
     post:
       consumes:
@@ -748,7 +1127,7 @@ paths:
               type: object
       summary: Update an existing GRPC service
       tags:
-      - 服务管理
+      - Service Management
   /service/update_tcp:
     post:
       consumes:
@@ -776,5 +1155,33 @@ paths:
               type: object
       summary: Update an existing TCP service
       tags:
-      - 服务管理
+      - Service Management
+  /service_update:
+    post:
+      consumes:
+      - application/json
+      description: 更新一个 HTTP 服务
+      operationId: /service/update_http
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceAddHTTPInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceListOutput'
+              type: object
+      summary: Update an existing HTTP Service
+      tags:
+      - Service Management
 swagger: "2.0"

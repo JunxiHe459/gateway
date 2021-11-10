@@ -9,7 +9,6 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"time"
 )
 
 type DashboardController struct{}
@@ -18,11 +17,11 @@ func DashboardRegister(group *gin.RouterGroup) {
 	service := &DashboardController{}
 	group.GET("/panel_group_data", service.PanelGroupData)
 	group.GET("/flow_stat", service.FlowStat)
-	//group.GET("/service_stat", service.ServiceStat)
+	group.GET("/service_stat", service.ServiceStat)
 }
 
 // PanelGroupData godoc
-// @Summary 指标统计
+// @Summary General Stats
 // @Description 指标统计
 // @Tags Dashboard
 // @ID /dashboard/panel_group_data
@@ -60,33 +59,34 @@ func (service *DashboardController) PanelGroupData(c *gin.Context) {
 // @ID /dashboard/flow_stat
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=dto.ServiceStatOutput} "success"
+// @Success 200 {object} middleware.Response{data=dto.ServiceStatsOutput} "success"
 // @Router /dashboard/flow_stat [get]
 func (service *DashboardController) FlowStat(c *gin.Context) {
-	counter, err := public.FlowCounterHandler.GetCounter(public.FlowTotal)
-	if err != nil {
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
-	todayList := []int{}
-	currentTime := time.Now()
-	for i := 0; i <= currentTime.Hour(); i++ {
-		dateTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 0, 0, 0, lib.TimeLocation)
-		hourData, _ := counter.GetHourData(dateTime)
-		todayList = append(todayList, int(hourData))
-	}
-
-	yesterdayList := []int{}
-	yesterTime := currentTime.Add(-1 * time.Duration(time.Hour*24))
-	for i := 0; i <= 23; i++ {
-		dateTime := time.Date(yesterTime.Year(), yesterTime.Month(), yesterTime.Day(), i, 0, 0, 0, lib.TimeLocation)
-		hourData, _ := counter.GetHourData(dateTime)
-		yesterdayList = append(yesterdayList, int(hourData))
-	}
-	middleware.ResponseSuccess(c, &dto.ServiceStatsOutput{
-		Today:     todayList,
-		Yesterday: yesterdayList,
-	})
+	//counter, err := public.FlowCounterHandler.GetCounter(public.FlowTotal)
+	//if err != nil {
+	//	middleware.ResponseError(c, 2001, err)
+	//	return
+	//}
+	//todayList := []int{}
+	//currentTime := time.Now()
+	//for i := 0; i <= currentTime.Hour(); i++ {
+	//	dateTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+	//	hourData, _ := counter.GetHourData(dateTime)
+	//	todayList = append(todayList, int(hourData))
+	//}
+	//
+	//yesterdayList := []int{}
+	//yesterTime := currentTime.Add(-1 * time.Duration(time.Hour*24))
+	//for i := 0; i <= 23; i++ {
+	//	dateTime := time.Date(yesterTime.Year(), yesterTime.Month(), yesterTime.Day(), i, 0, 0, 0, lib.TimeLocation)
+	//	hourData, _ := counter.GetHourData(dateTime)
+	//	yesterdayList = append(yesterdayList, int(hourData))
+	//}
+	//middleware.ResponseSuccess(c, &dto.ServiceStatsOutput{
+	//	Today:     todayList,
+	//	Yesterday: yesterdayList,
+	//})
+	middleware.ResponseSuccess(c, &dto.ServiceStatsOutput{})
 }
 
 //ServiceStat godoc

@@ -37,7 +37,7 @@ func RegisterService(group *gin.RouterGroup) {
 // Service godoc
 // @Summary Service List
 // @Description 服务列表
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/service_list
 // @Accept json
 // @Produce json
@@ -117,6 +117,7 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 		ipList := serviceDetail.LoadBalance.GetIPListByModel()
 		singleService := dto.SingleService{
 			ID:             item.ID,
+			LoadType:       item.LoadType,
 			ServiceName:    item.ServiceName,
 			ServiceDesc:    item.ServiceDesc,
 			ServiceAddress: serviceAddress,
@@ -138,7 +139,7 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 // Service godoc
 // @Summary Delete service
 // @Description 删除一个服务
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/delete
 // @Accept json
 // @Produce json
@@ -187,7 +188,7 @@ func (s *ServiceController) DeleteService(c *gin.Context) {
 // Service godoc
 // @Summary Add a new HTTP Service
 // @Description 添加一个新的 HTTP 服务
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/add_http
 // @Accept json
 // @Produce json
@@ -216,6 +217,7 @@ func (s *ServiceController) AddHTTPService(c *gin.Context) {
 	// 查看有没有重复的 ServiceName
 	serviceInfo := &dao.ServiceInfo{
 		ServiceName: params.ServiceName,
+		IsDelete:    0,
 	}
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err != gorm.ErrRecordNotFound {
@@ -326,13 +328,13 @@ func (s *ServiceController) AddHTTPService(c *gin.Context) {
 // Service godoc
 // @Summary Update an existing HTTP Service
 // @Description 更新一个 HTTP 服务
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/update_http
 // @Accept json
 // @Produce json
 // @Param body body dto.ServiceAddHTTPInput true "body"
 // @Success 200 {object} middleware.Response{data=dto.ServiceListOutput} "success"
-// @Router /service/add_http [POST]
+// @Router /service_update [POST]
 func (s *ServiceController) UpdateHTTPService(c *gin.Context) {
 	params := &dto.ServiceUpdateHTTPInput{}
 	err := params.BindParam(c)
@@ -433,7 +435,7 @@ func (s *ServiceController) UpdateHTTPService(c *gin.Context) {
 // Service godoc
 // @Summary Details of a service
 // @Description 服务详情
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/service_details
 // @Accept json
 // @Produce json
@@ -473,7 +475,7 @@ func (service *ServiceController) ServiceDetail(c *gin.Context) {
 // Service godoc
 // @Summary Network Flow statistics
 // @Description 流量数据
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/service_detail
 // @Accept json
 // @Produce json
@@ -518,7 +520,7 @@ func (service *ServiceController) ServiceStats(c *gin.Context) {
 // ServiceAddHttp godoc
 // @Summary Add a new TCP service
 // @Description tcp服务添加
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/service_add_tcp
 // @Accept  json
 // @Produce  json
@@ -620,7 +622,7 @@ func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 // ServiceUpdateTcp godoc
 // @Summary Update an existing TCP service
 // @Description tcp服务更新
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/service_update_tcp
 // @Accept  json
 // @Produce  json
@@ -710,7 +712,7 @@ func (admin *ServiceController) ServiceUpdateTcp(c *gin.Context) {
 // ServiceAddHttp godoc
 // @Summary Add a new GRPC service
 // @Description grpc服务添加
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/service_add_grpc
 // @Accept  json
 // @Produce  json
@@ -814,7 +816,7 @@ func (admin *ServiceController) ServiceAddGRPC(c *gin.Context) {
 // ServiceUpdateTcp godoc
 // @Summary Update an existing GRPC service
 // @Description grpc服务更新
-// @Tags 服务管理
+// @Tags Service Management
 // @ID /service/service_update_grpc
 // @Accept  json
 // @Produce  json
